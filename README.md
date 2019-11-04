@@ -16,12 +16,6 @@ docker-composeで全部自動で作成されるので、`docker-comopse.yml`と`
 └── vhost.d（自動生成）
 ```
 
-環境別の変数は`.env`に定義する。
-```.env
-DEFAULT_HOST=k12i.space
-NETWORK=nginx-ssl
-```
-
 ## 0からの構築
 1. dockerのインストール
 2. docker-composeのインストール
