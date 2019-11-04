@@ -1,5 +1,7 @@
-# docker + docker-compose.yml + nginx-proxy + etsencrypt-nginx-proxy-companionで他のdockerコンテナをSSL化
-httpsを使うdockerコンテナの前段に配置してSSL化する。
+# dockerコンテナをSSL化
+docker + docker-compose.yml + nginx-proxy + letsencrypt-nginx-proxy-companionで他のdockerコンテナをSSL化する。
+- nginx-proxy ... 他のコンテナに数行設定を書くとそこにプロキシしてくれるコンテナ
+- letsencrypt-nginx-proxy-companion ... nginx-proxy用に作られた、Let's Encryptの自動登録と自動更新をしてくれるコンテナ
 
 ## 構成
 docker-composeで全部自動で作成されるので、`docker-comopse.yml`と`.env`を書くだけ。
@@ -117,4 +119,53 @@ nginx-sslという名前のネットワークを作成
 $ docker network create nginx-ssl
 ```
 
+Python + Flask + UWSGIのコンテナの設定例
+```yml
+version: "2"
+services:
+
+  uwsgi:
+    build: ./app
+    volumes:
+      - ./app/:/var/www/
+      - ./logs:/var/logs/
+    ports:
+      - "3031:3031"
+    environment:
+      TZ: "Asia/Tokyo"
+    networks:
+      - flask_uwsgi_nginx
+
+  nginx:
+    build: ./nginx
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/logs:/var/log/nginx
+    networks:
+      - flask_uwsgi_nginx
+      
+      # nginx-proxyのネットワークに接続する
+      - nginx-ssl
+    ports:
+      - "60000:80"
+    environment:
+      TZ: "Asia/Tokyo"
+
+      # proxyのvhostの設定
+      VIRTUAL_HOST: example.com
+      VIRTUAL_PORT: 60000
+
+      # Let's Encryptの設定
+      LETSENCRYPT_HOST: example.com
+      LETSENCRYPT_EMAIL: mailaddress@example.com
+
+networks:
+  flask_uwsgi_nginx:
+    driver: bridge
+
+  # 作成済のnginx-sslに接続する
+  nginx-ssl:
+    external: true
+
+```
 *TODO: 確認用の簡単なコンテナを作成*
