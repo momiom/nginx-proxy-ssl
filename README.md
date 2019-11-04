@@ -6,6 +6,7 @@ docker + docker-compose.yml + nginx-proxy + letsencrypt-nginx-proxy-companionで
 ## 構成
 docker-composeで全部自動で作成されるので、`docker-comopse.yml`と`.env`を書くだけ。
 
+```
 .
 ├── docker-compose.yml
 ├── .env
@@ -13,6 +14,7 @@ docker-composeで全部自動で作成されるので、`docker-comopse.yml`と`
 ├── conf.d（自動生成）
 ├── html（自動生成）
 └── vhost.d（自動生成）
+```
 
 環境別の変数は`.env`に定義する。
 ```.env
